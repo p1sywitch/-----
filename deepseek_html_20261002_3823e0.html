@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>grego - Portföy</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #08080c;
+    --card: #0f0f16;
+    --border: #1c1c26;
+    --text: #e8e8e8;
+    --muted: #777;
+    --cyan: #00d4ff;
+    --purple: #7b2ff7;
+    --green: #43b581;
+  }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 60px 20px;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    top: -200px; left: -200px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(0,212,255,0.12), transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+  body::after {
+    content: "";
+    position: fixed;
+    bottom: -200px; right: -200px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(123,47,247,0.12), transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+
+  .container {
+    position: relative; z-index: 1;
+    width: 100%; max-width: 900px;
+    margin: 0 auto;
+    display: flex; flex-direction: column; align-items: center;
+  }
+
+  /* PROFİL */
+  .profile {
+    display: flex; flex-direction: column; align-items: center;
+    text-align: center; margin-bottom: 40px;
+    animation: fadeUp 0.8s ease;
+  }
+
+  .profile-img {
+    width: 160px; height: 160px;
+    border-radius: 50%; object-fit: cover;
+    border: 4px solid transparent;
+    background: linear-gradient(var(--bg), var(--bg)) padding-box,
+                linear-gradient(135deg, var(--cyan), var(--purple)) border-box;
+    box-shadow: 0 0 40px rgba(0,212,255,0.25);
+    margin-bottom: 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .profile-img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 60px rgba(0,212,255,0.5);
+  }
+
+  .profile h1 {
+    font-size: 2.8rem; font-weight: 700;
+    letter-spacing: -1px;
+    background: linear-gradient(90deg, var(--cyan), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 6px;
+  }
+
+  .tagline {
+    color: #888; font-size: 1.05rem; margin-bottom: 18px;
+  }
+
+  /* ROZETLER */
+  .badges-row {
+    display: flex; gap: 10px; justify-content: center;
+    flex-wrap: wrap; margin-bottom: 20px;
+  }
+  .badge-icon {
+    width: 36px; height: 36px;
+    background: #13131a;
+    border: 1px solid #222;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+    cursor: help;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .badge-icon:hover {
+    transform: translateY(-3px) scale(1.1);
+    border-color: var(--cyan);
+  }
+  .badge-icon svg { width: 20px; height: 20px; }
+  .badge-icon .tooltip {
+    position: absolute;
+    bottom: -32px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1a1a24;
+    border: 1px solid #222;
+    color: #ccc;
+    font-size: 0.7rem;
+    padding: 4px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+    z-index: 10;
+  }
+  .badge-icon:hover .tooltip { opacity: 1; }
+
+  /* GEÇİŞLİ YAZI */
+  .rotating-text {
+    height: 30px;
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 25px;
+  }
+  .rotating-text span {
+    display: block;
+    height: 30px;
+    line-height: 30px;
+    color: var(--cyan);
+    font-weight: 600;
+    font-size: 1rem;
+    animation: rotateText 9s infinite;
+    text-align: center;
+  }
+  @keyframes rotateText {
+    0%, 28%   { transform: translateY(0); }
+    33%, 61%  { transform: translateY(-30px); }
+    66%, 94%  { transform: translateY(-60px); }
+    100%      { transform: translateY(-90px); }
+  }
+
+  /* BUTONLAR */
+  .btn {
+    border: none;
+    padding: 12px 30px;
+    border-radius: 999px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    font-family: inherit;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--cyan), var(--purple));
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(0,212,255,0.3);
+  }
+  .btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(0,212,255,0.5);
+  }
+  .btn-outline {
+    background: transparent;
+    color: #ccc;
+    border: 1px solid var(--border);
+  }
+  .btn-outline:hover {
+    border-color: var(--cyan);
+    color: #fff;
+  }
+
+  .btn-row {
+    display: flex; gap: 12px; flex-wrap: wrap;
+    justify-content: center; margin-bottom: 20px;
+  }
+
+  /* PROJELER PANELİ */
+  .projects-panel {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease, opacity 0.4s ease, margin 0.4s ease;
+    opacity: 0;
+    width: 100%;
+    margin-top: 0;
+  }
+  .projects-panel.open {
+    max-height: 800px;
+    opacity: 1;
+    margin-top: 20px;
+  }
+
+  .discord-invite {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 25px;
+    text-align: center;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+  .discord-invite::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--cyan), var(--purple));
+  }
+  .discord-invite h3 {
+    color: #fff;
+    font-size: 1.1rem;
+    margin-bottom: 12px;
+  }
+  .discord-invite a {
+    display: inline-block;
+    background: #5865F2;
+    color: #fff;
+    padding: 12px 28px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: background 0.2s, transform 0.2s;
+    word-break: break-all;
+  }
+  .discord-invite a:hover {
+    background: #4752c4;
+    transform: translateY(-2px);
+  }
+
+  /* BÖLÜM BAŞLIĞI */
+  .section-title {
+    font-size: 1.5rem; font-weight: 600; color: #fff;
+    margin: 60px 0 30px;
+    display: flex; align-items: center; gap: 12px;
+    width: 100%;
+  }
+  .section-title::before {
+    content: "";
+    width: 4px; height: 24px;
+    background: linear-gradient(180deg, var(--cyan), var(--purple));
+    border-radius: 2px;
+  }
+
+  /* İSTATİSTİKLER */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 20px;
+    width: 100%;
+  }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 25px;
+    text-align: center;
+    transition: transform 0.25s, border-color 0.25s;
+  }
+  .stat-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--cyan);
+  }
+  .stat-number {
+    font-size: 2.2rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--cyan), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .stat-label {
+    color: #888;
+    font-size: 0.85rem;
+  }
+
+  /* DİLLER */
+  .langs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px; width: 100%;
+  }
+  .lang-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 25px;
+    display: flex; align-items: center; gap: 18px;
+    transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+    position: relative; overflow: hidden;
+  }
+  .lang-card::before {
+    content: "";
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(0,212,255,0.05), transparent);
+    opacity: 0; transition: opacity 0.25s;
+  }
+  .lang-card:hover {
+    transform: translateY(-6px);
+    border-color: var(--cyan);
+    box-shadow: 0 10px 40px rgba(0,212,255,0.15);
+  }
+  .lang-card:hover::before { opacity: 1; }
+  .lang-card img {
+    width: 56px; height: 56px;
+    object-fit: contain; flex-shrink: 0; z-index: 1;
+  }
+  .lang-info { z-index: 1; }
+  .lang-info .name {
+    font-size: 1.15rem; font-weight: 600;
+    color: #fff; margin-bottom: 4px;
+  }
+  .lang-info .desc {
+    font-size: 0.8rem; color: #666; line-height: 1.4;
+  }
+
+  /* PROJELER */
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    width: 100%;
+  }
+  .project-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 25px;
+    transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+  .project-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--cyan), var(--purple));
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+  .project-card:hover {
+    transform: translateY(-6px);
+    border-color: var(--cyan);
+    box-shadow: 0 10px 40px rgba(0,212,255,0.15);
+  }
+  .project-card:hover::before { opacity: 1; }
+  .project-icon {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(0,212,255,0.15), rgba(123,47,247,0.15));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+  }
+  .project-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+  .project-desc {
+    font-size: 0.85rem;
+    color: #777;
+    line-height: 1.5;
+    margin-bottom: 15px;
+  }
+  .project-tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .tag {
+    background: rgba(0,212,255,0.1);
+    border: 1px solid rgba(0,212,255,0.3);
+    color: var(--cyan);
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 600;
+  }
+
+  /* HİZMETLER */
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    width: 100%;
+  }
+  .service-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 25px;
+    transition: transform 0.25s, border-color 0.25s;
+  }
+  .service-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--purple);
+  }
+  .service-icon {
+    font-size: 2rem;
+    margin-bottom: 12px;
+  }
+  .service-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+  .service-desc {
+    font-size: 0.85rem;
+    color: #777;
+    line-height: 1.5;
+  }
+
+  /* DENEYİM */
+  .exp-card {
+    margin-top: 30px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 30px;
+    width: 100%;
+    display: flex; align-items: center; gap: 25px;
+    position: relative; overflow: hidden;
+  }
+  .exp-card::before {
+    content: "";
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--cyan), var(--purple));
+  }
+  .exp-number {
+    font-size: 3.5rem; font-weight: 800;
+    background: linear-gradient(135deg, var(--cyan), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1;
+  }
+  .exp-text h3 {
+    font-size: 1.2rem; color: #fff; margin-bottom: 6px;
+  }
+  .exp-text p {
+    color: #777; font-size: 0.9rem; line-height: 1.5;
+  }
+
+  /* YORUMLAR */
+  .reviews {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    width: 100%;
+  }
+  .review-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 25px;
+    transition: transform 0.25s, border-color 0.25s;
+  }
+  .review-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--cyan);
+  }
+  .review-stars {
+    color: #f5c518;
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+  }
+  .review-text {
+    color: #aaa;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: 15px;
+    font-style: italic;
+  }
+  .review-author {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .review-avatar {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--cyan), var(--purple));
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700;
+    color: #fff;
+    font-size: 0.9rem;
+  }
+  .review-name {
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+  .review-role {
+    color: #666;
+    font-size: 0.75rem;
+  }
+
+  /* SSS */
+  .faq {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .faq-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: border-color 0.25s;
+  }
+  .faq-item:hover { border-color: var(--cyan); }
+  .faq-question {
+    padding: 18px 22px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.95rem;
+    user-select: none;
+  }
+  .faq-question .arrow {
+    transition: transform 0.3s;
+    color: var(--cyan);
+  }
+  .faq-item.open .faq-question .arrow { transform: rotate(180deg); }
+  .faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+    padding: 0 22px;
+    color: #888;
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+  .faq-item.open .faq-answer {
+    max-height: 200px;
+    padding: 0 22px 18px;
+  }
+
+  /* İLETİŞİM */
+  .contact-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    width: 100%;
+  }
+  .contact-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 25px;
+    text-align: center;
+    transition: transform 0.25s, border-color 0.25s;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+  .contact-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--cyan);
+  }
+  .contact-icon {
+    font-size: 2rem;
+    margin-bottom: 12px;
+  }
+  .contact-name {
+    color: #fff;
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 5px;
+  }
+  .contact-value {
+    color: #777;
+    font-size: 0.85rem;
+    word-break: break-all;
+  }
+
+  footer {
+    margin-top: 70px;
+    color: #333;
+    font-size: 0.8rem;
+    z-index: 1;
+    text-align: center;
+  }
+  footer .footer-links {
+    display: flex;
+    gap: 25px;
+    justify-content: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  footer .footer-links a {
+    color: #555;
+    text-decoration: none;
+    transition: color 0.2s;
+    cursor: pointer;
+    font-size: 0.85rem;
+  }
+  footer .footer-links a:hover { color: var(--cyan); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 500px) {
+    .profile h1 { font-size: 2.1rem; }
+    .exp-card { flex-direction: column; text-align: center; }
+    .section-title { font-size: 1.3rem; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- PROFİL -->
+    <div class="profile">
+      <img src="profil.png" alt="grego" class="profile-img"
+           onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'">
+      <h1>grego</h1>
+      <p class="tagline">Python & Node.js Geliştiricisi</p>
+
+      <!-- ROZETLER -->
+      <div class="badges-row">
+        <div class="badge-icon">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 2L14 8L20 9L15.5 13L17 19L12 16L7 19L8.5 13L4 9L10 8L12 2Z" fill="#00d4ff"/>
+          </svg>
+          <span class="tooltip">Aktif Geliştirici</span>
+        </div>
+        <div class="badge-icon">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 2L3 5V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V5L12 2ZM12 11.99H19C18.47 16.11 15.72 19.78 12 20.93V12H5V6.3L12 3.19V11.99Z" fill="#7b2ff7"/>
+          </svg>
+          <span class="tooltip">Moderasyon Bot Geliştiricisi</span>
+        </div>
+        <div class="badge-icon">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M9 16.17L4.83 12L3.41 13.41L9 19L21 7L19.59 5.59L9 16.17Z" fill="#43b581"/>
+          </svg>
+          <span class="tooltip">Onaylı Bot Geliştiricisi</span>
+        </div>
+        <div class="badge-icon">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z" fill="#faa61a"/>
+          </svg>
+          <span class="tooltip">Erken Destekçi</span>
+        </div>
+        <div class="badge-icon">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20ZM12.5 7H11V13L16.25 16.15L17 14.92L12.5 12.25V7Z" fill="#ed4245"/>
+          </svg>
+          <span class="tooltip">Aktif Mod</span>
+        </div>
+        <div class="badge-icon">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 1L3 5V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V5L12 1ZM12 11.99H19C18.47 16.11 15.72 19.78 12 20.93V12H5V6.3L12 3.19V11.99Z" fill="#faa61a"/>
+          </svg>
+          <span class="tooltip">Discord Partner</span>
+        </div>
+      </div>
+
+      <!-- GEÇİŞLİ YAZI -->
+      <div class="rotating-text">
+        <span>
+          Aktif Geliştirici<br>
+          Moderasyon Bot Geliştiricisi<br>
+          Discord Bot Uzmanı<br>
+          Aktif Geliştirici
+        </span>
+      </div>
+
+      <!-- BUTONLAR -->
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="toggleProjects()">Projelerimi Gör</button>
+        <a class="btn btn-outline" href="#contact">İletişime Geç</a>
+      </div>
+
+      <!-- PROJELER PANELİ -->
+      <div class="projects-panel" id="projectsPanel">
+        <div class="discord-invite">
+          <h3>Discord Sunucum</h3>
+          <a href="https://discord.gg/BtVzb4ztA" target="_blank">https://discord.gg/BtVzb4ztA</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- İSTATİSTİKLER -->
+    <h2 class="section-title">İstatistikler</h2>
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-number">50+</div>
+        <div class="stat-label">Tamamlanan Proje</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">30+</div>
+        <div class="stat-label">Mutlu Müşteri</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">3</div>
+        <div class="stat-label">Yıl Deneyim</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">15+</div>
+        <div class="stat-label">Aktif Bot</div>
+      </div>
+    </div>
+
+    <!-- BİLDİĞİM DİLLER -->
+    <h2 class="section-title">Bildiğim Diller</h2>
+    <div class="langs">
+      <div class="lang-card">
+        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" alt="Python">
+        <div class="lang-info">
+          <div class="name">Python</div>
+          <div class="desc">Backend, otomasyon, bot geliştirme</div>
+        </div>
+      </div>
+      <div class="lang-card">
+        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" alt="Node.js">
+        <div class="lang-info">
+          <div class="name">Node.js</div>
+          <div class="desc">API, web sunucu, Discord bot</div>
+        </div>
+      </div>
+      <div class="lang-card">
+        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" alt="HTML5">
+        <div class="lang-info">
+          <div class="name">HTML5</div>
+          <div class="desc">Web sayfaları, semantik yapı</div>
+        </div>
+      </div>
+      <div class="lang-card">
+        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg" alt="CSS3">
+        <div class="lang-info">
+          <div class="name">CSS3</div>
+          <div class="desc">Modern tasarım, animasyonlar</div>
+        </div>
+      </div>
+      <div class="lang-card">
+        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" alt="JavaScript">
+        <div class="lang-info">
+          <div class="name">JavaScript</div>
+          <div class="desc">İnteraktif web, frontend</div>
+        </div>
+      </div>
+      <div class="lang-card">
+        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/lua/lua-original.svg" alt="Lua">
+        <div class="lang-info">
+          <div class="name">Lua</div>
+          <div class="desc">Roblox, oyun scriptleri</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROJELER -->
+    <h2 class="section-title">Projelerim</h2>
+    <div class="projects-grid">
+      <div class="project-card">
+        <div class="project-icon">🤖</div>
+        <div class="project-title">Moderasyon Botu</div>
+        <div class="project-desc">Gelişmiş moderasyon özellikleri, otomatik ceza sistemi, log kayıtları ve daha fazlası.</div>
+        <div class="project-tags">
+          <span class="tag">Python</span>
+          <span class="tag">discord.py</span>
+        </div>
+      </div>
+      <div class="project-card">
+        <div class="project-icon">🎵</div>
+        <div class="project-title">Müzik Botu</div>
+        <div class="project-desc">YouTube, Spotify ve SoundCloud desteği ile yüksek kaliteli müzik çalma.</div>
+        <div class="project-tags">
+          <span class="tag">Node.js</span>
+          <span class="tag">discord.js</span>
+        </div>
+      </div>
+      <div class="project-card">
+        <div class="project-icon">🌐</div>
+        <div class="project-title">Web Sitesi</div>
+        <div class="project-desc">Modern, responsive ve hızlı yüklenen kurumsal web siteleri.</div>
+        <div class="project-tags">
+          <span class="tag">HTML</span>
+          <span class="tag">CSS</span>
+          <span class="tag">JS</span>
+        </div>
+      </div>
+      <div class="project-card">
+        <div class="project-icon">📊</div>
+        <div class="project-title">API Servisi</div>
+        <div class="project-desc">RESTful API, veritabanı yönetimi ve güvenli kimlik doğrulama.</div>
+        <div class="project-tags">
+          <span class="tag">Node.js</span>
+          <span class="tag">Express</span>
+        </div>
+      </div>
+      <div class="project-card">
+        <div class="project-icon">🎮</div>
+        <div class="project-title">Roblox Sistemi</div>
+        <div class="project-desc">Oyun içi ekonomi, envanter ve özelleştirme sistemleri.</div>
+        <div class="project-tags">
+          <span class="tag">Lua</span>
+          <span class="tag">Roblox</span>
+        </div>
+      </div>
+      <div class="project-card">
+        <div class="project-icon">⚙️</div>
+        <div class="project-title">Otomasyon</div>
+        <div class="project-desc">Tekrarlayan görevleri otomatikleştiren Python scriptleri.</div>
+        <div class="project-tags">
+          <span class="tag">Python</span>
+          <span class="tag">Selenium</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- HİZMETLER -->
+    <h2 class="section-title">Hizmetlerim</h2>
+    <div class="services-grid">
+      <div class="service-card">
+        <div class="service-icon">🤖</div>
+        <div class="service-title">Bot Geliştirme</div>
+        <div class="service-desc">Discord botları, moderasyon, müzik, ekonomi ve daha fazlası.</div>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">🌐</div>
+        <div class="service-title">Web Geliştirme</div>
+        <div class="service-desc">Modern web siteleri, portföyler, landing page'ler.</div>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">⚙️</div>
+        <div class="service-title">Otomasyon</div>
+        <div class="service-desc">Tekrarlayan işleri otomatikleştiren scriptler.</div>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">🔧</div>
+        <div class="service-title">API Geliştirme</div>
+        <div class="service-desc">RESTful API, veritabanı ve backend çözümleri.</div>
+      </div>
+    </div>
+
+    <!-- DENEYİM -->
+    <h2 class="section-title">Deneyim</h2>
+    <div class="exp-card">
+      <div class="exp-number">3</div>
+      <div class="exp-text">
+        <h3>Yıl Deneyim</h3>
+        <p>Python ve Node.js ile 3 yıldır aktif olarak projeler geliştiriyorum. Bot, API, otomasyon ve web uygulamaları konusunda tecrübeliyim.</p>
+      </div>
+    </div>
+
+    <!-- YORUMLAR -->
+    <h2 class="section-title">Müşteri Yorumları</h2>
+    <div class="reviews">
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <div class="review-text">"Botu zamanında teslim etti, çok kaliteli iş çıkardı. Kesinlikle tavsiye ederim."</div>
+        <div class="review-author">
+          <div class="review-avatar">A</div>
+          <div>
+            <div class="review-name">Ahmet</div>
+            <div class="review-role">Discord Sunucu Sahibi</div>
+          </div>
+        </div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <div class="review-text">"Web sitemi çok modern yaptı. Hızlı ve sorunsuz çalışıyor."</div>
+        <div class="review-author">
+          <div class="review-avatar">M</div>
+          <div>
+            <div class="review-name">Mert</div>
+            <div class="review-role">Girişimci</div>
+          </div>
+        </div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">★★★★☆</div>
+        <div class="review-text">"Otomasyon scripti işlerimi çok kolaylaştırdı. Teşekkürler!"</div>
+        <div class="review-author">
+          <div class="review-avatar">Z</div>
+          <div>
+            <div class="review-name">Zeynep</div>
+            <div class="review-role">İçerik Üreticisi</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SSS -->
+    <h2 class="section-title">Sıkça Sorulan Sorular</h2>
+    <div class="faq">
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          Bot yapımı ne kadar sürer?
+          <span class="arrow">▼</span>
+        </div>
+        <div class="faq-answer">Projenin büyüklüğüne göre 1-7 gün arasında değişir. Basit botlar 1-2 gün, gelişmiş botlar 1 haftaya kadar sürebilir.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          Fiyatlandırma nasıl?
+          <span class="arrow">▼</span>
+        </div>
+        <div class="faq-answer">Projeye göre değişir. Basit projeler için uygun fiyatlar, büyük projeler için özel teklifler sunuyorum. Discord'dan ulaşabilirsin.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          Hangi dilleri kullanıyorsun?
+          <span class="arrow">▼</span>
+        </div>
+        <div class="faq-answer">Python, Node.js, HTML, CSS, JavaScript ve Lua. Projeye göre en uygun dili seçiyorum.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          Revizyon hakkım var mı?
+          <span class="arrow">▼</span>
+        </div>
+        <div class="faq-answer">Evet, teslimattan sonra 1 hafta içinde ücretsiz revizyon hakkın var. Sonrasında küçük değişiklikler için ek ücret alınabilir.</div>
+      </div>
+    </div>
+
+    <!-- İLETİŞİM (SADECE DISCORD) -->
+    <h2 class="section-title" id="contact">İletişim</h2>
+    <div class="contact-grid" style="grid-template-columns: 1fr; max-width: 400px;">
+      <a class="contact-card" href="https://discord.gg/BtVzb4ztA" target="_blank">
+        <div class="contact-icon">💬</div>
+        <div class="contact-name">Discord</div>
+        <div class="contact-value">discord.gg/BtVzb4ztA</div>
+      </a>
+    </div>
+
+    <footer>
+      <div class="footer-links">
+        <a onclick="alert('Gizlilik politikası')">Gizlilik</a>
+        <a onclick="alert('Kullanım koşulları')">Kullanım Koşulları</a>
+        <a href="#contact">İletişim</a>
+        <a onclick="alert('SSS')">SSS</a>
+      </div>
+      <p>© 2026 grego — Tüm hakları saklıdır.</p>
+    </footer>
+
+  </div>
+
+<script>
+  function toggleProjects() {
+    const panel = document.getElementById("projectsPanel");
+    panel.classList.toggle("open");
+  }
+
+  function toggleFaq(el) {
+    const item = el.parentElement;
+    item.classList.toggle("open");
+  }
+</script>
+
+</body>
+</html>
